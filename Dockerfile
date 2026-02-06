@@ -42,8 +42,6 @@ COPY <<'EOF' /app/start.sh
 set -e
 echo "Running database migrations..."
 ./node_modules/.bin/prisma db push --skip-generate
-echo "Seeding database..."
-./node_modules/.bin/prisma db seed
 echo "Starting application..."
 exec node server.js
 EOF
