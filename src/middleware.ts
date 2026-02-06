@@ -1,46 +1,38 @@
-import { withAuth } from 'next-auth/middleware';
+import { auth } from './lib/auth';
 import { NextResponse } from 'next/server';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const pathname = req.nextUrl.pathname;
+export default auth((req) => {
+  const { nextUrl } = req;
+  const isLoggedIn = !!req.auth;
+  const userRole = req.auth?.user?.role;
 
-    // Admin-only routes
-    if (
-      (pathname.startsWith('/admin') ||
-        pathname.startsWith('/scoring') ||
-        pathname.startsWith('/settings')) &&
-      token?.role !== 'ADMIN'
-    ) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
+  const isAuthPage = nextUrl.pathname.startsWith('/login') ||
+                     nextUrl.pathname.startsWith('/register');
+  const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth');
+  const isPublicRoute = isAuthPage || isApiAuthRoute;
 
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const pathname = req.nextUrl.pathname;
-
-        // Allow public routes
-        if (
-          pathname.startsWith('/login') ||
-          pathname.startsWith('/register') ||
-          pathname.startsWith('/api/auth')
-        ) {
-          return true;
-        }
-
-        // Require authentication for all other routes
-        return !!token;
-      },
-    },
+  // Redirect logged-in users away from auth pages
+  if (isLoggedIn && isAuthPage) {
+    return NextResponse.redirect(new URL('/dashboard', nextUrl));
   }
-);
+
+  // Redirect non-logged-in users to login
+  if (!isLoggedIn && !isPublicRoute) {
+    return NextResponse.redirect(new URL('/login', nextUrl));
+  }
+
+  // Check admin-only routes
+  const isAdminRoute = nextUrl.pathname.startsWith('/admin') ||
+                       nextUrl.pathname.startsWith('/scoring') ||
+                       nextUrl.pathname.startsWith('/settings');
+
+  if (isAdminRoute && userRole !== 'ADMIN') {
+    return NextResponse.redirect(new URL('/dashboard', nextUrl));
+  }
+
+  return NextResponse.next();
+});
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|public).*)'],
 };
