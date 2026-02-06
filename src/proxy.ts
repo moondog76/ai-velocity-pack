@@ -10,7 +10,8 @@ export default auth((req) => {
                      nextUrl.pathname.startsWith('/register');
   const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth');
   const isSeedRoute = nextUrl.pathname === '/api/seed';
-  const isPublicRoute = isAuthPage || isApiAuthRoute || isSeedRoute;
+  const isMigrateRoute = nextUrl.pathname === '/api/migrate';
+  const isPublicRoute = isAuthPage || isApiAuthRoute || isSeedRoute || isMigrateRoute;
 
   // Redirect logged-in users away from auth pages
   if (isLoggedIn && isAuthPage) {
