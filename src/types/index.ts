@@ -1,5 +1,4 @@
-import 'next-auth';
-
+// NextAuth v5 type extensions
 declare module 'next-auth' {
   interface User {
     id: string;
@@ -11,14 +10,6 @@ declare module 'next-auth' {
 
   interface Session {
     user: User;
-  }
-}
-
-declare module 'next-auth/jwt' {
-  interface JWT {
-    id: string;
-    role: string;
-    companyId: string | null;
   }
 }
 
