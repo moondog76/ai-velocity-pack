@@ -38,5 +38,9 @@ RUN npm install --no-save prisma@5.22.0
 
 EXPOSE 3000
 
+# Set environment for Next.js standalone
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
 # Run migrations and start server
 CMD ./node_modules/.bin/prisma db push --skip-generate && node server.js
