@@ -33,8 +33,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 
-# Install ONLY Prisma CLI 5.22.0 (exact version, no dependencies)
-RUN npm install --no-save prisma@5.22.0
+# Install ONLY Prisma CLI and tsx for seeding (exact versions, no dependencies)
+RUN npm install --no-save prisma@5.22.0 tsx@4.21.0
 
 EXPOSE 3000
 
@@ -42,5 +42,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Run migrations and start server
-CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && node server.js"
+# Run migrations, seed, and start server
+CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && ./node_modules/.bin/tsx prisma/seed.ts && node server.js"
