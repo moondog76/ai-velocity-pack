@@ -1,3 +1,4 @@
+# Use Dockerfile CMD - no custom startCommand
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
