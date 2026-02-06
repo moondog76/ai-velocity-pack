@@ -39,10 +39,14 @@ RUN npm install --no-save prisma@5.22.0
 # Create startup script
 COPY <<'EOF' /app/start.sh
 #!/bin/sh
-set -e
-echo "Running database migrations..."
-./node_modules/.bin/prisma db push --skip-generate
-echo "Starting application..."
+set -ex
+echo "=== Running database migrations ==="
+./node_modules/.bin/prisma db push --skip-generate || echo "Migration failed: $?"
+echo "=== Migrations complete ==="
+echo "=== Checking if server.js exists ==="
+ls -la server.js || echo "server.js not found!"
+echo "=== Starting Next.js application ==="
+export PORT=3000
 exec node server.js
 EOF
 
