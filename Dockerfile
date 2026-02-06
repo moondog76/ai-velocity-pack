@@ -43,4 +43,4 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Run migrations and start server
-CMD ./node_modules/.bin/prisma db push --skip-generate && node server.js
+CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && echo '=== Prisma done, checking files ===' && ls -la server.js && echo '=== Starting server ===' && node server.js"
