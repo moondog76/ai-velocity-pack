@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  passwordHash  String
+  role          Role      @default(COMPANY_USER)
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  ADMIN
+  COMPANY_USER
+}
+
+model Company {
+  id                    String                 @id @default(cuid())
+  name                  String
+  website               String?
+  primaryLanguage       String?
+  framework             String?
+  enrolledAt            DateTime               @default(now())
+  users                 User[]
+  baseline              Baseline?
+  sprintReport          SprintReport?
+  governanceChecklist   GovernanceChecklist?
+  scores                Score?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+}
+
+model Baseline {
+  id          String         @id @default(cuid())
+  companyId   String         @unique
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status      SubmissionStatus @default(DRAFT)
+  data        Json
+  submittedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model SprintReport {
+  id          String         @id @default(cuid())
+  companyId   String         @unique
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status      SubmissionStatus @default(DRAFT)
+  data        Json
+  submittedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model GovernanceChecklist {
+  id          String         @id @default(cuid())
+  companyId   String         @unique
+  company     Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status      SubmissionStatus @default(DRAFT)
+  data        Json
+  submittedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+enum SubmissionStatus {
+  NOT_STARTED
+  DRAFT
+  SUBMITTED
+  GRADED
+}
+
+model Score {
+  id                  String   @id @default(cuid())
+  companyId           String   @unique
+  company             Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  agenticEvidence     Int      @default(0)
+  cycleTimeImprovement Int     @default(0)
+  reviewEfficiency    Int      @default(0)
+  qualityReliability  Int      @default(0)
+  governanceReadiness Int      @default(0)
+  repeatability       Int      @default(0)
+  totalScore          Int      @default(0)
+  notes               String?  @db.VarChar(280)
+  gradedAt            DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  message   String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ProgramSettings {
+  id           String   @id @default("default")
+  programName  String   @default("AI Velocity Pack")
+  dayZero      DateTime
+  baselineDue  DateTime
+  sprintDue    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
