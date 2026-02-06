@@ -42,5 +42,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Just start the server - skip migrations
-CMD ["node", "server.js"]
+# Run migrations and start server
+CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && node server.js"
