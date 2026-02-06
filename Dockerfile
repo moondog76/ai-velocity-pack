@@ -36,11 +36,15 @@ COPY --from=builder /app/package.json ./package.json
 # Install ONLY Prisma CLI 5.22.0 (exact version, no dependencies)
 RUN npm install --no-save prisma@5.22.0
 
+# Copy startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 EXPOSE 3000
 
 # Set environment for Next.js standalone
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Run migrations and start server
-CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && echo '=== Prisma done, checking files ===' && ls -la server.js && echo '=== Starting server ===' && node server.js"
+# Run startup script
+CMD ["/app/start.sh"]
