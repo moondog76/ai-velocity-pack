@@ -1,19 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth-utils';
 
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const session = await auth();
-    if (!session?.user) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { companyId, fileName, fileSize, fileContent } = await request.json();
+    let { companyId, fileName, fileSize, fileContent } = await request.json();
+
+    // For admin users without a companyId, resolve one from the database
+    if (!companyId && user.role === 'ADMIN') {
+      const firstCompany = await prisma.company.findFirst({ select: { id: true } });
+      companyId = firstCompany?.id ?? null;
+    }
+
+    if (!companyId) {
+      return NextResponse.json({ error: 'No company associated with this account' }, { status: 400 });
+    }
 
     // Verify user belongs to the company
-    if (session.user.companyId !== companyId && session.user.role !== 'ADMIN') {
+    if (user.companyId !== companyId && user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -33,14 +43,14 @@ export async function POST(request: NextRequest) {
         fileSize,
         fileUrl,
         auditSummary,
-        uploadedBy: session.user.name || session.user.email,
+        uploadedBy: user.name || user.email,
       },
       update: {
         fileName,
         fileSize,
         fileUrl,
         auditSummary,
-        uploadedBy: session.user.name || session.user.email,
+        uploadedBy: user.name || user.email,
         submittedAt: new Date(),
       },
     });

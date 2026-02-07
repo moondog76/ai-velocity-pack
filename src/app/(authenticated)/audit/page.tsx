@@ -10,10 +10,17 @@ export const dynamic = 'force-dynamic';
 export default async function CodebaseAuditPage() {
   const user = await requireAuth();
 
+  // For admin users without a companyId, use the first company
+  let companyId = user.companyId;
+  if (!companyId && user.role === 'ADMIN') {
+    const firstCompany = await prisma.company.findFirst({ select: { id: true } });
+    companyId = firstCompany?.id ?? null;
+  }
+
   // Get existing audit if any
-  const existingAudit = user.companyId
+  const existingAudit = companyId
     ? await prisma.codebaseAudit.findUnique({
-        where: { companyId: user.companyId },
+        where: { companyId },
       })
     : null;
 
@@ -95,7 +102,7 @@ export default async function CodebaseAuditPage() {
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Upload Audit Report</h2>
           <AuditUploadForm
-            companyId={user.companyId!}
+            companyId={companyId!}
             existingAudit={existingAudit}
           />
         </div>
