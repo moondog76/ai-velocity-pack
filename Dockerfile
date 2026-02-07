@@ -1,23 +1,24 @@
 # Install dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+FROM node:20-slim AS deps
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # Build application
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Production image
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
-RUN apk add --no-cache openssl
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -33,8 +34,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 
-# Install ONLY Prisma CLI and tsx for seeding (exact versions, no dependencies)
-RUN npm install --no-save prisma@5.22.0 tsx@4.21.0
+# Install ONLY Prisma CLI 5.22.0 (exact version)
+RUN npm install --no-save prisma@5.22.0
 
 EXPOSE 3000
 
@@ -42,5 +43,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Run migrations, seed, and start server
-CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && ./node_modules/.bin/tsx prisma/seed.ts && node server.js"
+# Run migrations and start server
+CMD sh -c "./node_modules/.bin/prisma db push --skip-generate && node server.js"
