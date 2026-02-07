@@ -6,7 +6,8 @@ import {
   promptPatterns,
   kpiRubric,
 } from '@/data/program-content';
-import { Check, X, Copy } from 'lucide-react';
+import { Check, X } from 'lucide-react';
+import { CopyButton, SmallCopyButton } from '@/components/CopyButton';
 
 export default async function MaterialsPage() {
   await requireAuth();
@@ -52,13 +53,10 @@ export default async function MaterialsPage() {
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900">CEO/CTO Memo</h2>
-            <button
-              onClick={() => navigator.clipboard.writeText(ctoMemo)}
+            <CopyButton
+              text={ctoMemo}
               className="flex items-center gap-2 px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
-            >
-              <Copy className="h-4 w-4" />
-              Copy to Clipboard
-            </button>
+            />
           </div>
           <div className="prose prose-sm max-w-none text-slate-600 whitespace-pre-wrap">
             {ctoMemo}
@@ -96,13 +94,7 @@ export default async function MaterialsPage() {
               <div key={pattern.name} className="border border-slate-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-slate-900">{pattern.name}</h3>
-                  <button
-                    onClick={() => navigator.clipboard.writeText(pattern.promptTemplate)}
-                    className="flex items-center gap-1 px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded transition-colors"
-                  >
-                    <Copy className="h-3 w-3" />
-                    Copy
-                  </button>
+                  <SmallCopyButton text={pattern.promptTemplate} />
                 </div>
                 <p className="text-sm text-slate-600 mb-3">{pattern.description}</p>
                 <pre className="bg-slate-50 border border-slate-200 rounded p-3 text-xs overflow-x-auto">
