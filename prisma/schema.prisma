@@ -37,6 +37,7 @@ model Company {
   sprintReport          SprintReport?
   governanceChecklist   GovernanceChecklist?
   scores                Score?
+  codebaseAudit         CodebaseAudit?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 }
@@ -113,4 +114,18 @@ model ProgramSettings {
   sprintDue    DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model CodebaseAudit {
+  id            String   @id @default(cuid())
+  companyId     String   @unique
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  fileName      String
+  fileUrl       String
+  fileSize      Int
+  auditSummary  String?  @db.Text
+  uploadedBy    String
+  submittedAt   DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

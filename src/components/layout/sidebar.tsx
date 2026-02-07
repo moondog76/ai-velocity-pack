@@ -11,6 +11,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  FileSearch,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,12 @@ const navItems = [
     name: 'Program Materials',
     href: '/materials',
     icon: BookOpen,
+    roles: ['ADMIN', 'COMPANY_USER'],
+  },
+  {
+    name: 'Codebase Audit',
+    href: '/audit',
+    icon: FileSearch,
     roles: ['ADMIN', 'COMPANY_USER'],
   },
   {
