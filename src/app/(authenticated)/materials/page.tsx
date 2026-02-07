@@ -9,6 +9,8 @@ import {
 import { Check, X } from 'lucide-react';
 import { CopyButton, SmallCopyButton } from '@/components/CopyButton';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MaterialsPage() {
   await requireAuth();
 

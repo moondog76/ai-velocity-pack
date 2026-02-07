@@ -2,6 +2,8 @@ import { getCurrentUser } from '@/lib/auth-utils';
 import { AdminDashboard } from '@/components/dashboard/admin-dashboard';
 import { CompanyDashboard } from '@/components/dashboard/company-dashboard';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 

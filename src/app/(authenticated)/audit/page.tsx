@@ -5,6 +5,8 @@ import { Upload, FileText, CheckCircle, Download } from 'lucide-react';
 import { CopyButton } from '@/components/CopyButton';
 import { AuditUploadForm } from '@/components/AuditUploadForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CodebaseAuditPage() {
   const user = await requireAuth();
 
