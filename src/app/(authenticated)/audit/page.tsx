@@ -11,7 +11,7 @@ export default async function CodebaseAuditPage() {
   const user = await requireAuth();
 
   // For admin users without a companyId, use the first company
-  let companyId = user.companyId;
+  let companyId: string | null = user.companyId;
   if (!companyId && user.role === 'ADMIN') {
     const firstCompany = await prisma.company.findFirst({ select: { id: true } });
     companyId = firstCompany?.id ?? null;
