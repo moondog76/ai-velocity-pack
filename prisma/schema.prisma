@@ -31,6 +31,10 @@ model Company {
   website               String?
   primaryLanguage       String?
   framework             String?
+  contactEmail          String?
+  teamSize              Int?
+  githubUrl             String?
+  active                Boolean                @default(true)
   enrolledAt            DateTime               @default(now())
   users                 User[]
   baseline              Baseline?
@@ -38,6 +42,7 @@ model Company {
   governanceChecklist   GovernanceChecklist?
   scores                Score?
   codebaseAudit         CodebaseAudit?
+  aiAnalyses            AiAnalysis[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 }
@@ -107,13 +112,37 @@ model Announcement {
 }
 
 model ProgramSettings {
-  id           String   @id @default("default")
-  programName  String   @default("AI Velocity Pack")
-  dayZero      DateTime
-  baselineDue  DateTime
-  sprintDue    DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                    String   @id @default("default")
+  programName           String   @default("AI Velocity Pack")
+  dayZero               DateTime
+  baselineDue           DateTime
+  sprintDue             DateTime
+  aiModel               String   @default("claude-sonnet-4-5-20250929")
+  autoAnalyze           Boolean  @default(false)
+  maxAnalysesPerDay     Int      @default(3)
+  requireAiBeforeManual Boolean  @default(false)
+  notifyWelcome         Boolean  @default(true)
+  notify48h             Boolean  @default(true)
+  notify24h             Boolean  @default(true)
+  notifySubmission      Boolean  @default(true)
+  notifyScore           Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model AiAnalysis {
+  id          String    @id @default(cuid())
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  aiScores    Json
+  finalScores Json?
+  adminEdits  Json?
+  adminNotes  String?
+  savedBy     String?
+  analyzedAt  DateTime  @default(now())
+  savedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model CodebaseAudit {

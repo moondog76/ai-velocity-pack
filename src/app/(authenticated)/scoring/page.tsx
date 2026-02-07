@@ -16,6 +16,7 @@ export default async function ScoringPage() {
       governanceChecklist: { select: { status: true, submittedAt: true } },
       codebaseAudit: { select: { id: true, fileName: true, submittedAt: true } },
       scores: true,
+      aiAnalyses: { orderBy: { analyzedAt: 'desc' }, take: 1 },
     },
     orderBy: { name: 'asc' },
   });
@@ -108,6 +109,13 @@ export default async function ScoringPage() {
             <ScoringForm
               companyId={company.id}
               companyName={company.name}
+              hasSubmissions={!!(company.baseline || company.sprintReport || company.governanceChecklist || company.codebaseAudit)}
+              existingAiAnalysis={company.aiAnalyses?.[0] ? {
+                dimensions: (company.aiAnalyses[0].aiScores as any)?.dimensions || [],
+                overallSummary: (company.aiAnalyses[0].aiScores as any)?.overallSummary || '',
+                recommendations: (company.aiAnalyses[0].aiScores as any)?.recommendations || [],
+                analyzedAt: company.aiAnalyses[0].analyzedAt.toISOString(),
+              } : null}
               existingScore={company.scores ? {
                 agenticEvidence: company.scores.agenticEvidence,
                 cycleTimeImprovement: company.scores.cycleTimeImprovement,
