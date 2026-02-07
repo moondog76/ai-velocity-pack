@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   FileSearch,
+  Lightbulb,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -38,6 +39,12 @@ const navItems = [
     name: 'Deliverables',
     href: '/deliverables',
     icon: FileText,
+    roles: ['ADMIN', 'COMPANY_USER'],
+  },
+  {
+    name: 'Best Practices',
+    href: '/best-practices',
+    icon: Lightbulb,
     roles: ['ADMIN', 'COMPANY_USER'],
   },
   {
