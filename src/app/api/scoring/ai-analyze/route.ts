@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-utils';
-import Anthropic from '@anthropic-ai/sdk';
 
 const SCORING_SYSTEM_PROMPT = `You are an AI scoring assistant for Asort Ventures' AI Velocity Pack program. You evaluate portfolio companies' submissions against a standardized rubric.
 
@@ -145,40 +144,55 @@ export async function POST(request: NextRequest) {
 
     const submissionContent = submissionParts.join('\n');
 
-    // Call Anthropic API
+    // Call Opper API (OpenAI-compatible endpoint)
     const apiKey = process.env.OPPER_KEY;
     if (!apiKey) {
       return NextResponse.json({
         success: false,
-        error: 'AI analysis temporarily unavailable. OPPER_KEY not configured. You can still score manually.',
+        error: 'AI analysis temporarily unavailable. OPPER_KEY not configured.',
       }, { status: 503 });
     }
 
-    const anthropic = new Anthropic({ apiKey });
-    const aiModel = settings?.aiModel || 'claude-sonnet-4-5-20250929';
+    const aiModel = settings?.aiModel || 'anthropic/claude-sonnet-4-5-20250929';
 
     let aiResult: any;
     let retries = 0;
 
     while (retries < 2) {
       try {
-        const message = await anthropic.messages.create({
-          model: aiModel,
-          max_tokens: 4096,
-          system: SCORING_SYSTEM_PROMPT,
-          messages: [
-            {
-              role: 'user',
-              content: `Please analyze the following company submissions and provide scores:\n\n${submissionContent}`,
-            },
-          ],
+        const response = await fetch('https://api.opper.ai/compat/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer -',
+            'x-opper-api-key': apiKey,
+          },
+          body: JSON.stringify({
+            model: aiModel,
+            messages: [
+              { role: 'system', content: SCORING_SYSTEM_PROMPT },
+              { role: 'user', content: `Please analyze the following company submissions and provide scores:\n\n${submissionContent}` },
+            ],
+            max_tokens: 4096,
+            temperature: 0.3,
+          }),
         });
 
-        const textBlock = message.content.find((b: any) => b.type === 'text');
-        const responseText = textBlock ? (textBlock as any).text : '';
-        aiResult = JSON.parse(responseText);
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error('Opper API error:', response.status, errText);
+          throw new Error(`API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+
+        // Strip markdown code fences if present
+        const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        aiResult = JSON.parse(cleaned);
         break;
-      } catch (parseErr) {
+      } catch (parseErr: any) {
+        console.error('AI analysis attempt failed:', parseErr.message);
         retries++;
         if (retries >= 2) {
           return NextResponse.json({

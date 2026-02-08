@@ -117,7 +117,7 @@ model ProgramSettings {
   dayZero               DateTime
   baselineDue           DateTime
   sprintDue             DateTime
-  aiModel               String   @default("claude-sonnet-4-5-20250929")
+  aiModel               String   @default("anthropic/claude-sonnet-4-5-20250929")
   autoAnalyze           Boolean  @default(false)
   maxAnalysesPerDay     Int      @default(3)
   requireAiBeforeManual Boolean  @default(false)

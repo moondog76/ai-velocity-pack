@@ -61,6 +61,12 @@ Always check this file before analysis, building, or debugging.
 - **Fix:** Switch to `FormData` upload on client, `request.formData()` on server. Use `Buffer.from(arrayBuffer)` for all file types.
 - **Lesson:** Never send file content as JSON. Always use FormData for file uploads. Handle binary files (PDF) with ArrayBuffer, not `.text()`.
 
+### 8. AI analysis not working — Anthropic SDK can't use Opper key
+- **Symptom:** AI scoring silently fails or returns 503
+- **Root cause:** `OPPER_KEY` is for Opper.ai (model orchestration), not a direct Anthropic API key. The Anthropic SDK sends requests to `api.anthropic.com` which rejects the Opper key.
+- **Fix:** Replaced Anthropic SDK with plain `fetch` to Opper's OpenAI-compatible endpoint (`https://api.opper.ai/compat/openai/v1/chat/completions`). Auth via `x-opper-api-key` header. Model names use `provider/model` format (e.g. `anthropic/claude-sonnet-4-5-20250929`).
+- **Lesson:** When using model orchestration tools (Opper, OpenRouter, LiteLLM), don't use provider-specific SDKs. Use the OpenAI-compatible endpoint with `fetch` or the OpenAI SDK. Check the auth header format — Opper uses `x-opper-api-key`, not `Authorization: Bearer`.
+
 ---
 
 ## Architecture Notes
@@ -68,4 +74,5 @@ Always check this file before analysis, building, or debugging.
 - **Auth:** Real NextAuth v5 with credentials provider. `getCurrentUser()` reads the JWT session. Requires `NEXTAUTH_SECRET` env var. Login page at `/login`, register at `/register`.
 - **Deploy:** Railway with Nixpacks (nixpacks.toml controls build + start). Dockerfile exists but may not be used.
 - **DB:** PostgreSQL on Railway. Schema managed by Prisma. Use `prisma db push --accept-data-loss` for production schema sync.
-- **Stack:** Next.js 16 (App Router), Prisma 5.22.0, Tailwind v4, Radix UI, Anthropic SDK for AI scoring.
+- **AI:** Uses Opper.ai as model orchestration layer. API calls go to `https://api.opper.ai/compat/openai/v1/chat/completions` with `x-opper-api-key` header. Models use `provider/model` format. No provider-specific SDK needed.
+- **Stack:** Next.js 16 (App Router), Prisma 5.22.0, Tailwind v4, Radix UI.

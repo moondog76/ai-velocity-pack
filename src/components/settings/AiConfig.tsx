@@ -34,7 +34,7 @@ export function AiConfig({ settings }: AiConfigProps) {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const [form, setForm] = useState({
-    aiModel: settings?.aiModel || 'claude-sonnet-4-5-20250929',
+    aiModel: settings?.aiModel || 'anthropic/claude-sonnet-4-5-20250929',
     autoAnalyze: settings?.autoAnalyze ?? false,
     maxAnalysesPerDay: settings?.maxAnalysesPerDay ?? 3,
     requireAiBeforeManual: settings?.requireAiBeforeManual ?? false,
@@ -129,8 +129,10 @@ export function AiConfig({ settings }: AiConfigProps) {
           onChange={(e) => setForm({ ...form, aiModel: e.target.value })}
           className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Better quality, recommended)</option>
-          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (Faster, lower cost)</option>
+          <option value="anthropic/claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Better quality, recommended)</option>
+          <option value="anthropic/claude-haiku-4-5-20251001">Claude Haiku 4.5 (Faster, lower cost)</option>
+          <option value="openai/gpt-4o">GPT-4o (OpenAI)</option>
+          <option value="openai/gpt-4o-mini">GPT-4o Mini (OpenAI, lower cost)</option>
         </select>
         <p className="text-xs text-slate-500 mt-1">Sonnet produces higher quality analyses. Haiku is faster and cheaper for iterative use.</p>
       </div>
