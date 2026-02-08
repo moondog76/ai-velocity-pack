@@ -7,6 +7,8 @@ async function main() {
   console.log('Starting seed...');
 
   // Clear existing data
+  await prisma.aiAnalysis.deleteMany();
+  await prisma.codebaseAudit.deleteMany();
   await prisma.score.deleteMany();
   await prisma.governanceChecklist.deleteMany();
   await prisma.sprintReport.deleteMany();
@@ -310,6 +312,200 @@ async function main() {
     },
   });
   console.log('Created GreenRoute with score');
+
+  // Add CodebaseAudit for GreenRoute
+  const auditContent = `# GreenRoute Platform — Codebase Audit Report
+
+## 1. Codebase Structure & Organization (8/10)
+
+**Architecture:** Monorepo using Turborepo with 3 packages:
+- \`apps/web\` — Next.js 14 frontend (App Router, RSC)
+- \`apps/api\` — tRPC API layer with Prisma ORM
+- \`libs/shared\` — Shared types, utilities, validation schemas
+
+**Strengths:**
+- Clean separation of concerns with clear package boundaries
+- Consistent file naming conventions (kebab-case)
+- Well-structured route organization following Next.js conventions
+- Shared type definitions prevent drift between frontend and API
+
+**Weaknesses:**
+- Some god-components in the dashboard (>400 lines)
+- Route optimization logic mixed with UI components
+
+## 2. Code Quality Metrics (7/10)
+
+- **Test Coverage:** ~62% (unit: 78%, integration: 45%, E2E: 12%)
+- **TypeScript Strict Mode:** Enabled, zero \`any\` types in production code
+- **Linting:** ESLint + Prettier with custom rules, enforced in CI
+- **Technical Debt:** 14 TODO comments, 3 deprecated API endpoints still in use
+- **Bundle Size:** 287KB gzipped (good for feature set)
+
+## 3. AI Tool Readiness (9/10)
+
+**Excellent readiness.** This codebase is highly suitable for AI-assisted development:
+- Strong type system gives AI clear contracts to work with
+- Consistent patterns (tRPC routers, React hooks, Prisma queries) are easy for AI to extend
+- Good test coverage provides safety net for AI-generated code
+- Clear naming conventions reduce ambiguity
+
+**Areas for improvement:**
+- Add more JSDoc comments on complex business logic (route optimization, pricing)
+- Create ARCHITECTURE.md for onboarding context
+- Standardize error handling patterns across API routes
+
+## 4. Language & Framework Analysis
+
+| Component | Version | Status |
+|-----------|---------|--------|
+| Next.js | 14.2.1 | Current |
+| TypeScript | 5.4.2 | Current |
+| Prisma | 5.11.0 | Current |
+| tRPC | 11.0.0 | Current |
+| React | 18.3.1 | Current |
+| Tailwind CSS | 3.4.1 | Current |
+
+All dependencies are up-to-date. No known vulnerabilities detected by \`npm audit\`.
+
+## 5. Development Workflow (8/10)
+
+- **CI/CD:** Vercel CI with preview deployments per PR
+- **Build Time:** ~45 seconds (Turborepo cached: ~8 seconds)
+- **Local Setup:** Single \`pnpm install && pnpm dev\` command
+- **PR Process:** Template with checklist, auto-assigned reviewers
+- **Onboarding:** New developer productive within 1 day
+
+## 6. Security & Governance (7/10)
+
+- Environment variables managed via Vercel, no secrets in code
+- NextAuth.js with JWT sessions, CSRF protection enabled
+- Input validation via Zod schemas on all API endpoints
+- Missing: formal security review process, no penetration testing
+- Missing: data classification policy for customer PII
+
+## 7. Recommendations
+
+### Top 3 Immediate Actions:
+1. **Break up dashboard god-components** — Split into focused components (<200 lines each)
+2. **Add ARCHITECTURE.md** — Document system design for AI agent context
+3. **Increase E2E coverage** — Target 30% for critical user flows
+
+### Quick Wins for AI Development:
+- Add \`.cursorrules\` or \`CLAUDE.md\` with project conventions
+- Create prompt templates for common tasks (new tRPC route, new component)
+- Set up automated PR description generation
+
+### Long-term:
+- Migrate remaining REST endpoints to tRPC (3 legacy endpoints)
+- Implement feature flags for safer AI-generated deployments
+- Add observability (OpenTelemetry) for production monitoring`;
+
+  const auditBase64 = Buffer.from(auditContent).toString('base64');
+  await prisma.codebaseAudit.create({
+    data: {
+      companyId: greenroute.id,
+      fileName: 'greenroute-codebase-audit-2026-02.md',
+      fileUrl: `data:text/markdown;base64,${auditBase64}`,
+      fileSize: auditContent.length,
+      auditSummary: auditContent.substring(0, 500),
+      uploadedBy: 'alex@greenroute.com',
+      submittedAt: new Date('2026-02-15'),
+    },
+  });
+  console.log('Created GreenRoute codebase audit');
+
+  // Add AiAnalysis for GreenRoute
+  await prisma.aiAnalysis.create({
+    data: {
+      companyId: greenroute.id,
+      aiScores: {
+        dimensions: [
+          {
+            name: 'Agentic Evidence',
+            score: 3,
+            confidence: 'high',
+            rationale: 'Strong evidence of agentic AI usage throughout the sprint. Claude Code and Cursor used extensively with documented commands and PR links. WebSocket implementation shows end-to-end AI-assisted development.',
+            evidence: [
+              'PR #234 created entirely with Claude Code assistance',
+              'CI logs show AI-generated test suite passing on first run',
+              'Documented specific prompts used for WebSocket server implementation',
+              'Both engineers actively used AI tools throughout the sprint',
+            ],
+          },
+          {
+            name: 'Cycle Time Improvement',
+            score: 3,
+            confidence: 'high',
+            rationale: 'PR cycle time reduced from 4 hours to 2 hours (50% improvement). Feature delivered in 8 calendar hours vs. estimated 3-5 days manual development. Significant and measurable improvement.',
+            evidence: [
+              'Baseline PR cycle time: 4 hours → Sprint PR cycle time: 2 hours',
+              'Complete feature (WebSocket + React UI) shipped in single 8-hour session',
+              'Zero review iterations indicates first-time-right quality',
+              'Deploy frequency maintained at 10-15/week during sprint',
+            ],
+          },
+          {
+            name: 'Review Efficiency',
+            score: 2,
+            confidence: 'medium',
+            rationale: 'Review iterations reduced from 1 to 0 for this PR, which is excellent. However, sample size is small (single sprint PR). Documentation auto-generated by Claude is a strong positive signal.',
+            evidence: [
+              'PR merged with zero review iterations',
+              'API documentation auto-generated',
+              'Integration tests provided confidence for reviewer',
+            ],
+          },
+          {
+            name: 'Quality & Reliability',
+            score: 2,
+            confidence: 'medium',
+            rationale: 'Good quality indicators: zero CI failures, tests updated, docs updated. However, no mention of load testing for WebSocket connections, which is a critical reliability concern for real-time features.',
+            evidence: [
+              'Zero CI failures during sprint',
+              '15 unit tests + integration tests added',
+              'No post-merge issues reported',
+              'Missing: load/stress testing for WebSocket connections',
+            ],
+          },
+          {
+            name: 'Governance Readiness',
+            score: 2,
+            confidence: 'high',
+            rationale: 'Comprehensive governance checklist completed. All sections show YES with documented processes. Strong on secrets management and access control. Minor gap: data map not formalized (marked YES but using local Claude Code).',
+            evidence: [
+              'All governance checklist items marked YES',
+              'Pre-commit hooks for secrets detection',
+              'Role-based access via GitHub teams',
+              'Incident process documented',
+              'Automated secret rotation via Vault',
+            ],
+          },
+          {
+            name: 'Repeatability',
+            score: 2,
+            confidence: 'medium',
+            rationale: 'Good initial signs: decision to EXPAND indicates team confidence. Template prompts planned. However, process documentation for how to replicate this success is still informal. Need structured playbook.',
+            evidence: [
+              'Decision: EXPAND to more use cases',
+              'Next use cases identified (ETA calculations, route re-optimization)',
+              'Template prompts planned but not yet created',
+              'Two engineers trained (not just one champion)',
+            ],
+          },
+        ],
+        overallSummary: 'GreenRoute demonstrates excellent AI-assisted development practices with strong agentic evidence and measurable cycle time improvements. The team successfully shipped a real-time WebSocket feature in a fraction of the estimated time while maintaining code quality. Governance practices are comprehensive. Main areas for improvement: establishing repeatable processes and expanding quality assurance to include load testing for real-time features.',
+        recommendations: [
+          'Create a structured AI development playbook documenting prompt patterns, tool configurations, and workflow best practices to ensure repeatability across the team.',
+          'Add load testing for WebSocket connections before scaling the real-time tracking feature to production traffic levels.',
+          'Formalize the data map for AI tool usage, documenting exactly what data flows through AI tools even when using local-only tools like Claude Code.',
+          'Share sprint learnings with the broader team via an internal tech talk or written retrospective to accelerate AI adoption across other product areas.',
+        ],
+      },
+      analyzedAt: new Date('2026-02-19'),
+      createdAt: new Date('2026-02-19'),
+    },
+  });
+  console.log('Created GreenRoute AI analysis');
 
   // 3. MediTrack - Healthtech, Go/React, baseline only
   const meditrack = await prisma.company.create({
