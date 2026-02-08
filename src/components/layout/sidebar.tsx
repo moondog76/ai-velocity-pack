@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { signOut, useSession } from 'next-auth/react';
 import {
   LayoutDashboard,
   BookOpen,
@@ -69,20 +68,20 @@ const navItems = [
 
 interface SidebarProps {
   onClose?: () => void;
+  user?: {
+    name: string;
+    email: string;
+    role: string;
+  } | null;
 }
 
-export function Sidebar({ onClose }: SidebarProps) {
+export function Sidebar({ onClose, user }: SidebarProps) {
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const userRole = session?.user?.role || 'COMPANY_USER';
+  const userRole = user?.role || 'COMPANY_USER';
 
   const filteredNavItems = navItems.filter((item) =>
     item.roles.includes(userRole)
   );
-
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: '/login' });
-  };
 
   return (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300">
@@ -118,31 +117,31 @@ export function Sidebar({ onClose }: SidebarProps) {
       </nav>
 
       {/* User info */}
-      {session?.user && (
+      {user && (
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-start gap-3 mb-3">
             <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium">
-              {session.user.name?.[0]?.toUpperCase() || 'U'}
+              {user.name?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">
-                {session.user.name}
+                {user.name}
               </p>
               <p className="text-xs text-slate-400 truncate">
-                {session.user.email}
+                {user.email}
               </p>
               <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300">
                 {userRole === 'ADMIN' ? 'Admin' : 'Company User'}
               </span>
             </div>
           </div>
-          <button
-            onClick={handleSignOut}
+          <Link
+            href="/login"
             className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-md hover:bg-slate-800 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign out</span>
-          </button>
+          </Link>
         </div>
       )}
     </div>

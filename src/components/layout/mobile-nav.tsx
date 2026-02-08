@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Sidebar } from './sidebar';
 
-export function MobileNav() {
+interface MobileNavProps {
+  user?: { name: string; email: string; role: string } | null;
+}
+
+export function MobileNav({ user }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -29,7 +33,7 @@ export function MobileNav() {
           {/* Sidebar */}
           <div className="fixed inset-y-0 left-0 w-64 z-50 lg:hidden">
             <div className="relative h-full">
-              <Sidebar onClose={() => setIsOpen(false)} />
+              <Sidebar onClose={() => setIsOpen(false)} user={user} />
               {/* Close button */}
               <button
                 onClick={() => setIsOpen(false)}
