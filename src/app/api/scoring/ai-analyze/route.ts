@@ -200,6 +200,7 @@ export async function POST(request: NextRequest) {
           ],
           max_tokens: 4096,
           temperature: 0.3,
+          response_format: { type: 'json_object' },
         });
 
         const content = completion.choices?.[0]?.message?.content || '';
@@ -210,9 +211,22 @@ export async function POST(request: NextRequest) {
           throw new Error(lastError);
         }
 
-        // Strip markdown code fences if present
-        const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        aiResult = JSON.parse(cleaned);
+        // Extract JSON from response — handle markdown fences and surrounding text
+        let jsonStr = content;
+        // Try to extract JSON from markdown code fences first
+        const fenceMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+        if (fenceMatch) {
+          jsonStr = fenceMatch[1];
+        }
+        // If no fence, try to find the JSON object in the text
+        if (!jsonStr.trimStart().startsWith('{')) {
+          const jsonStart = jsonStr.indexOf('{');
+          const jsonEnd = jsonStr.lastIndexOf('}');
+          if (jsonStart !== -1 && jsonEnd !== -1) {
+            jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
+          }
+        }
+        aiResult = JSON.parse(jsonStr.trim());
         console.log(`[AI Analysis] Successfully parsed response for ${company.name}`);
         break;
       } catch (err: any) {
