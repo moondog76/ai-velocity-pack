@@ -43,5 +43,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Run migrations and start server
-CMD sh -c "./node_modules/.bin/prisma db push --skip-generate --accept-data-loss && node server.js"
+# Run migrations, push schema, and start server
+CMD sh -c "echo '=== Running migrations ===' && ./node_modules/.bin/prisma migrate deploy; echo '=== Pushing schema ===' && ./node_modules/.bin/prisma db push --accept-data-loss && echo '=== Starting server ===' && node server.js"
