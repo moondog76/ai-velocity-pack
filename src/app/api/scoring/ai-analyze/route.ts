@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         baseline: true,
         sprintReport: true,
         governanceChecklist: true,
-        codebaseAudit: { select: { fileName: true, auditSummary: true, submittedAt: true } },
+        codebaseAudit: { select: { fileName: true, fileUrl: true, auditSummary: true, submittedAt: true } },
       },
     });
 
@@ -150,7 +150,23 @@ export async function POST(request: NextRequest) {
     }
     if (company.codebaseAudit) {
       submissionParts.push(`\n--- CODEBASE AUDIT (File: ${company.codebaseAudit.fileName}) ---`);
-      submissionParts.push(company.codebaseAudit.auditSummary || 'No summary available');
+      // Decode full content from base64 data URL for text files
+      const fileUrl = company.codebaseAudit.fileUrl;
+      if (fileUrl && (fileUrl.startsWith('data:text/') || fileUrl.startsWith('data:application/octet-stream'))) {
+        try {
+          const base64Content = fileUrl.split(',')[1];
+          if (base64Content) {
+            const fullContent = Buffer.from(base64Content, 'base64').toString('utf-8');
+            submissionParts.push(fullContent.substring(0, 50000));
+          } else {
+            submissionParts.push(company.codebaseAudit.auditSummary || 'No summary available');
+          }
+        } catch {
+          submissionParts.push(company.codebaseAudit.auditSummary || 'No summary available');
+        }
+      } else {
+        submissionParts.push(company.codebaseAudit.auditSummary || 'No summary available');
+      }
     }
 
     const submissionContent = submissionParts.join('\n');

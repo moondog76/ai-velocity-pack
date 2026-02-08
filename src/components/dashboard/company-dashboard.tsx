@@ -1,7 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { StatusBadge } from '@/components/shared/status-badge';
+import { ProgressTimeline } from '@/components/shared/ProgressTimeline';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { CompanyScoreCharts } from './CompanyScoreCharts';
 
 interface CompanyDashboardProps {
   companyId: string;
@@ -14,6 +16,7 @@ export async function CompanyDashboard({ companyId }: CompanyDashboardProps) {
       baseline: true,
       sprintReport: true,
       governanceChecklist: true,
+      codebaseAudit: true,
       scores: true,
     },
   });
@@ -35,6 +38,46 @@ export async function CompanyDashboard({ companyId }: CompanyDashboardProps) {
     where: { id: 'default' },
   });
 
+  // Build progress timeline milestones
+  const milestones = [
+    {
+      label: 'Enrolled',
+      status: 'complete' as const,
+      date: company.enrolledAt,
+    },
+    {
+      label: 'Baseline',
+      status: company.baseline?.status === 'SUBMITTED' || company.baseline?.status === 'GRADED'
+        ? 'complete' as const
+        : company.baseline?.status === 'DRAFT' ? 'in_progress' as const : 'pending' as const,
+      date: company.baseline?.submittedAt,
+    },
+    {
+      label: 'Audit',
+      status: company.codebaseAudit ? 'complete' as const : 'pending' as const,
+      date: company.codebaseAudit?.submittedAt,
+    },
+    {
+      label: 'Sprint Report',
+      status: company.sprintReport?.status === 'SUBMITTED' || company.sprintReport?.status === 'GRADED'
+        ? 'complete' as const
+        : company.sprintReport?.status === 'DRAFT' ? 'in_progress' as const : 'pending' as const,
+      date: company.sprintReport?.submittedAt,
+    },
+    {
+      label: 'Governance',
+      status: company.governanceChecklist?.status === 'SUBMITTED' || company.governanceChecklist?.status === 'GRADED'
+        ? 'complete' as const
+        : company.governanceChecklist?.status === 'DRAFT' ? 'in_progress' as const : 'pending' as const,
+      date: company.governanceChecklist?.submittedAt,
+    },
+    {
+      label: 'Scored',
+      status: company.scores?.gradedAt ? 'complete' as const : 'pending' as const,
+      date: company.scores?.gradedAt,
+    },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Announcements */}
@@ -42,11 +85,17 @@ export async function CompanyDashboard({ companyId }: CompanyDashboardProps) {
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
           {announcements.map((announcement) => (
             <p key={announcement.id} className="text-sm text-indigo-900">
-              📢 {announcement.message}
+              {announcement.message}
             </p>
           ))}
         </div>
       )}
+
+      {/* Progress Timeline */}
+      <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">Program Progress</h2>
+        <ProgressTimeline milestones={milestones} />
+      </div>
 
       {/* Deliverables Status */}
       <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
@@ -64,10 +113,12 @@ export async function CompanyDashboard({ companyId }: CompanyDashboardProps) {
               </p>
             )}
             <Link
-              href="/deliverables"
+              href="/deliverables/baseline"
               className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              {company.baseline ? 'View/Edit' : 'Start Now'} →
+              {company.baseline?.status === 'SUBMITTED' || company.baseline?.status === 'GRADED'
+                ? 'View Submission'
+                : company.baseline?.status === 'DRAFT' ? 'Continue Editing' : 'Start Now'} &rarr;
             </Link>
           </div>
 
@@ -83,10 +134,12 @@ export async function CompanyDashboard({ companyId }: CompanyDashboardProps) {
               </p>
             )}
             <Link
-              href="/deliverables"
+              href="/deliverables/sprint-report"
               className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              {company.sprintReport ? 'View/Edit' : 'Start Now'} →
+              {company.sprintReport?.status === 'SUBMITTED' || company.sprintReport?.status === 'GRADED'
+                ? 'View Submission'
+                : company.sprintReport?.status === 'DRAFT' ? 'Continue Editing' : 'Start Now'} &rarr;
             </Link>
           </div>
 
@@ -102,50 +155,36 @@ export async function CompanyDashboard({ companyId }: CompanyDashboardProps) {
               </p>
             )}
             <Link
-              href="/deliverables"
+              href="/deliverables/governance"
               className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              {company.governanceChecklist ? 'View/Edit' : 'Start Now'} →
+              {company.governanceChecklist?.status === 'SUBMITTED' || company.governanceChecklist?.status === 'GRADED'
+                ? 'View Submission'
+                : company.governanceChecklist?.status === 'DRAFT' ? 'Continue Editing' : 'Start Now'} &rarr;
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Score Card (if graded) */}
+      {/* Score Card with Radar Chart + RAG Status (if graded) */}
       {company.scores?.gradedAt && (
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Your Score</h2>
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-6">
             <div className="text-4xl font-bold text-indigo-600">{company.scores.totalScore}</div>
             <div className="text-2xl text-slate-400">/</div>
             <div className="text-2xl text-slate-600">18</div>
           </div>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Agentic Evidence</span>
-              <span className="font-medium">{company.scores.agenticEvidence}/3</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Cycle Time Improvement</span>
-              <span className="font-medium">{company.scores.cycleTimeImprovement}/3</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Review Efficiency</span>
-              <span className="font-medium">{company.scores.reviewEfficiency}/3</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Quality & Reliability</span>
-              <span className="font-medium">{company.scores.qualityReliability}/3</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Governance Readiness</span>
-              <span className="font-medium">{company.scores.governanceReadiness}/3</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Repeatability</span>
-              <span className="font-medium">{company.scores.repeatability}/3</span>
-            </div>
-          </div>
+
+          <CompanyScoreCharts scores={{
+            agenticEvidence: company.scores.agenticEvidence,
+            cycleTimeImprovement: company.scores.cycleTimeImprovement,
+            reviewEfficiency: company.scores.reviewEfficiency,
+            qualityReliability: company.scores.qualityReliability,
+            governanceReadiness: company.scores.governanceReadiness,
+            repeatability: company.scores.repeatability,
+          }} />
+
           {company.scores.notes && (
             <div className="mt-4 pt-4 border-t border-slate-200">
               <p className="text-sm text-slate-600 italic">{company.scores.notes}</p>

@@ -2,7 +2,8 @@ import { requireAuth } from '@/lib/auth-utils';
 import { prisma } from '@/lib/prisma';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { format } from 'date-fns';
-import { FileText, ClipboardCheck, Shield, FileSearch, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { FileText, ClipboardCheck, Shield, FileSearch, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,18 +13,22 @@ function DeliverableCard({
   status,
   submittedAt,
   data,
+  href,
+  summary,
 }: {
   title: string;
   icon: typeof FileText;
   status: string;
   submittedAt: Date | null;
   data: any;
+  href: string;
+  summary?: string;
 }) {
   const isSubmitted = status === 'SUBMITTED' || status === 'GRADED';
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Icon className="h-5 w-5 text-indigo-600" />
           <h3 className="font-semibold text-slate-900">{title}</h3>
@@ -37,25 +42,63 @@ function DeliverableCard({
         </p>
       )}
 
-      {isSubmitted && data ? (
-        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 max-h-64 overflow-y-auto">
-          <pre className="text-xs text-slate-700 whitespace-pre-wrap">
-            {JSON.stringify(data, null, 2)}
-          </pre>
-        </div>
-      ) : status === 'DRAFT' ? (
-        <div className="flex items-center gap-2 text-sm text-amber-600">
-          <Clock className="h-4 w-4" />
-          <span>Draft in progress - not yet submitted</span>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <AlertCircle className="h-4 w-4" />
-          <span>Not started yet</span>
-        </div>
+      {summary && (
+        <p className="text-sm text-slate-600 mb-3 line-clamp-2">{summary}</p>
       )}
+
+      {status === 'DRAFT' && !summary && (
+        <p className="text-sm text-amber-600 mb-3">Draft in progress — not yet submitted</p>
+      )}
+
+      {status === 'NOT_STARTED' && (
+        <p className="text-sm text-slate-500 mb-3">Not started yet</p>
+      )}
+
+      <Link
+        href={href}
+        className={`inline-flex items-center gap-1.5 text-sm font-medium rounded-lg px-4 py-2 transition-colors ${
+          status === 'NOT_STARTED'
+            ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+            : status === 'DRAFT'
+            ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+            : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+        }`}
+      >
+        {status === 'NOT_STARTED' && 'Start Now'}
+        {status === 'DRAFT' && 'Continue Editing'}
+        {(status === 'SUBMITTED' || status === 'GRADED') && 'View Submission'}
+        <ArrowRight className="h-3.5 w-3.5" />
+      </Link>
     </div>
   );
+}
+
+function getBaselineSummary(data: any): string {
+  if (!data) return '';
+  const parts: string[] = [];
+  if (data.repoContext?.primaryRepos) parts.push(data.repoContext.primaryRepos);
+  if (data.sprintItem?.description) parts.push(`Sprint: ${data.sprintItem.description}`);
+  return parts.join(' | ');
+}
+
+function getSprintSummary(data: any): string {
+  if (!data) return '';
+  const parts: string[] = [];
+  if (data.scope?.featureDescription) parts.push(data.scope.featureDescription);
+  if (data.agenticEvidence?.toolsUsed) parts.push(`Tools: ${data.agenticEvidence.toolsUsed}`);
+  return parts.join(' | ');
+}
+
+function getGovernanceSummary(data: any): string {
+  if (!data?.sectionA) return '';
+  const allItems = [
+    ...(data.sectionA || []),
+    ...(data.sectionB || []),
+    ...(data.sectionC || []),
+    ...(data.sectionD || []),
+  ];
+  const yesCount = allItems.filter((i: any) => i.status === 'YES').length;
+  return `${yesCount}/${allItems.length} items compliant`;
 }
 
 function CompanyDeliverables({
@@ -72,9 +115,27 @@ function CompanyDeliverables({
   };
 }) {
   const deliverables = [
-    { title: 'Baseline', icon: FileText, record: company.baseline },
-    { title: 'Sprint Report', icon: ClipboardCheck, record: company.sprintReport },
-    { title: 'Governance Checklist', icon: Shield, record: company.governanceChecklist },
+    {
+      title: 'Baseline Report',
+      icon: FileText,
+      record: company.baseline,
+      href: '/deliverables/baseline',
+      getSummary: getBaselineSummary,
+    },
+    {
+      title: 'Sprint Report',
+      icon: ClipboardCheck,
+      record: company.sprintReport,
+      href: '/deliverables/sprint-report',
+      getSummary: getSprintSummary,
+    },
+    {
+      title: 'Governance Checklist',
+      icon: Shield,
+      record: company.governanceChecklist,
+      href: '/deliverables/governance',
+      getSummary: getGovernanceSummary,
+    },
   ];
 
   const completedCount = deliverables.filter(
@@ -101,20 +162,24 @@ function CompanyDeliverables({
       </div>
 
       {/* Deliverable cards */}
-      {deliverables.map((d) => (
-        <DeliverableCard
-          key={d.title}
-          title={d.title}
-          icon={d.icon}
-          status={d.record?.status || 'NOT_STARTED'}
-          submittedAt={d.record?.submittedAt || null}
-          data={d.record?.data || null}
-        />
-      ))}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {deliverables.map((d) => (
+          <DeliverableCard
+            key={d.title}
+            title={d.title}
+            icon={d.icon}
+            status={d.record?.status || 'NOT_STARTED'}
+            submittedAt={d.record?.submittedAt || null}
+            data={d.record?.data || null}
+            href={d.href}
+            summary={d.record?.data ? d.getSummary(d.record.data) : undefined}
+          />
+        ))}
+      </div>
 
       {/* Codebase Audit card */}
       <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <FileSearch className="h-5 w-5 text-indigo-600" />
             <h3 className="font-semibold text-slate-900">Codebase Audit</h3>
@@ -130,7 +195,7 @@ function CompanyDeliverables({
           )}
         </div>
         {company.codebaseAudit ? (
-          <div className="space-y-1">
+          <div className="space-y-1 mb-3">
             <p className="text-sm text-slate-700">
               <span className="text-slate-500">File:</span> {company.codebaseAudit.fileName}
             </p>
@@ -139,15 +204,18 @@ function CompanyDeliverables({
             </p>
             <p className="text-xs text-slate-500">
               Uploaded {format(new Date(company.codebaseAudit.submittedAt), 'MMM d, yyyy h:mm a')}
-              {' by '}{company.codebaseAudit.uploadedBy}
             </p>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <AlertCircle className="h-4 w-4" />
-            <span>No audit uploaded yet</span>
-          </div>
+          <p className="text-sm text-slate-500 mb-3">No audit uploaded yet</p>
         )}
+        <Link
+          href="/audit"
+          className="inline-flex items-center gap-1.5 text-sm font-medium rounded-lg px-4 py-2 bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition-colors"
+        >
+          {hasAudit ? 'View / Replace Audit' : 'Upload Audit'}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
 
       {/* Score summary if graded */}
@@ -258,9 +326,9 @@ export default async function DeliverablesPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Deliverables</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Your Deliverables</h1>
         <p className="text-sm text-slate-600 mt-1">
-          Track your submission progress
+          Complete and submit all deliverables for the AI Velocity Pack program
         </p>
       </div>
       <CompanyDeliverables company={company} />
