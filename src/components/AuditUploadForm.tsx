@@ -45,21 +45,13 @@ export function AuditUploadForm({ companyId, existingAudit }: AuditUploadFormPro
     setError(null);
 
     try {
-      // Read file content
-      const content = await file.text();
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('companyId', companyId);
 
-      // Submit to API
       const response = await fetch('/api/audit/upload', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          companyId,
-          fileName: file.name,
-          fileSize: file.size,
-          fileContent: content,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {

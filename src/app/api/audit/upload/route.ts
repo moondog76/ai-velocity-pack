@@ -4,13 +4,18 @@ import { getCurrentUser } from '@/lib/auth-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let { companyId, fileName, fileSize, fileContent } = await request.json();
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+    let companyId = formData.get('companyId') as string | null;
+
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    }
 
     // For admin users without a companyId, resolve one from the database
     if (!companyId && user.role === 'ADMIN') {
@@ -27,12 +32,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // For simplicity, we'll store the file content as a base64 string in the database
-    // In production, you'd want to upload to S3/CloudFlare R2/etc.
-    const fileUrl = `data:text/plain;base64,${Buffer.from(fileContent).toString('base64')}`;
+    const fileName = file.name;
+    const fileSize = file.size;
 
-    // Extract summary from first 500 characters
-    const auditSummary = fileContent.substring(0, 500);
+    // Read file content
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Store as base64 data URL
+    const mimeType = fileName.endsWith('.pdf') ? 'application/pdf' : 'text/plain';
+    const fileUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
+
+    // Extract summary from text content (first 500 chars for text files)
+    let auditSummary = '';
+    if (!fileName.endsWith('.pdf')) {
+      const textContent = buffer.toString('utf-8');
+      auditSummary = textContent.substring(0, 500);
+    } else {
+      auditSummary = `PDF audit report: ${fileName}`;
+    }
 
     // Upsert the audit (create or update)
     const audit = await prisma.codebaseAudit.upsert({
