@@ -2,18 +2,15 @@ import { auth } from './auth';
 import { redirect } from 'next/navigation';
 
 export async function getCurrentUser() {
-  // TEMPORARY: Auth bypass for testing - REMOVE IN PRODUCTION
+  const session = await auth();
+  if (!session?.user) return null;
   return {
-    id: 'temp-admin-id',
-    email: 'admin@asort.vc',
-    name: 'Asort Admin',
-    role: 'ADMIN',
-    companyId: null,
+    id: session.user.id as string,
+    email: session.user.email as string,
+    name: session.user.name as string,
+    role: (session.user as any).role as string,
+    companyId: (session.user as any).companyId as string | null,
   };
-
-  // Original auth code (commented out temporarily):
-  // const session = await auth();
-  // return session?.user || null;
 }
 
 export async function requireAuth() {

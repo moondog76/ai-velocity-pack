@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import {
   LayoutDashboard,
   BookOpen,
@@ -135,13 +136,13 @@ export function Sidebar({ onClose, user }: SidebarProps) {
               </span>
             </div>
           </div>
-          <Link
-            href="/login"
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
             className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-md hover:bg-slate-800 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign out</span>
-          </Link>
+          </button>
         </div>
       )}
     </div>
