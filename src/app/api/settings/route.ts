@@ -19,7 +19,7 @@ export async function PUT(request: NextRequest) {
         dayZero: new Date(data.dayZero),
         baselineDue: new Date(data.baselineDue),
         sprintDue: new Date(data.sprintDue),
-        aiModel: data.aiModel || 'claude-sonnet-4-5-20250929',
+        aiModel: data.aiModel || 'anthropic/claude-sonnet-4.5',
         autoAnalyze: data.autoAnalyze ?? false,
         maxAnalysesPerDay: data.maxAnalysesPerDay ?? 3,
         requireAiBeforeManual: data.requireAiBeforeManual ?? false,

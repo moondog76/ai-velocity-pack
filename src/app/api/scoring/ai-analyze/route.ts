@@ -164,10 +164,22 @@ export async function POST(request: NextRequest) {
       }, { status: 503 });
     }
 
-    // Ensure model name has provider prefix (old DB values may lack it)
-    let aiModel = settings?.aiModel || 'anthropic/claude-sonnet-4-5-20250929';
+    // Ensure model name is valid for Opper
+    let aiModel = settings?.aiModel || 'anthropic/claude-sonnet-4.5';
+    // Fix old model names that don't exist on Opper
     if (!aiModel.includes('/')) {
       aiModel = `anthropic/${aiModel}`;
+    }
+    // Map old-style model names to Opper-compatible ones
+    const MODEL_FIXES: Record<string, string> = {
+      'anthropic/claude-sonnet-4-5-20250929': 'anthropic/claude-sonnet-4.5',
+      'anthropic/claude-sonnet-4-20250514': 'anthropic/claude-sonnet-4',
+      'claude-sonnet-4-5-20250929': 'anthropic/claude-sonnet-4.5',
+      'claude-sonnet-4-20250514': 'anthropic/claude-sonnet-4',
+    };
+    if (MODEL_FIXES[aiModel]) {
+      console.log(`[AI Analysis] Remapping model ${aiModel} -> ${MODEL_FIXES[aiModel]}`);
+      aiModel = MODEL_FIXES[aiModel];
     }
 
     // Create Opper client using OpenAI SDK (as per Opper docs)
@@ -204,7 +216,15 @@ export async function POST(request: NextRequest) {
         console.log(`[AI Analysis] Successfully parsed response for ${company.name}`);
         break;
       } catch (err: any) {
+        // Extract detailed error info from OpenAI SDK errors
         lastError = err.message || 'Unknown error';
+        if (err.status) lastError = `${err.status}: ${lastError}`;
+        if (err.error) {
+          try {
+            const errDetail = typeof err.error === 'string' ? err.error : JSON.stringify(err.error);
+            lastError += ` | detail: ${errDetail}`;
+          } catch {}
+        }
         console.error(`[AI Analysis] Attempt ${attempt + 1} failed:`, lastError);
         if (attempt >= 1) {
           return NextResponse.json({

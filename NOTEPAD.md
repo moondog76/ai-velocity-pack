@@ -74,5 +74,5 @@ Always check this file before analysis, building, or debugging.
 - **Auth:** Real NextAuth v5 with credentials provider. `getCurrentUser()` reads the JWT session. Requires `NEXTAUTH_SECRET` env var. Login page at `/login`, register at `/register`.
 - **Deploy:** Railway with Nixpacks (nixpacks.toml controls build + start). Dockerfile exists but may not be used.
 - **DB:** PostgreSQL on Railway. Schema managed by Prisma. Use `prisma db push --accept-data-loss` for production schema sync.
-- **AI:** Uses Opper.ai as model orchestration layer via the **OpenAI SDK** with `baseURL: "https://api.opper.ai/compat/openai"`, `apiKey: "-"`, and `x-opper-api-key` header. Models use `provider/model` format (e.g. `anthropic/claude-sonnet-4-5-20250929`). Requires `openai` npm package.
+- **AI:** Uses Opper.ai as model orchestration layer via the **OpenAI SDK** with `baseURL: "https://api.opper.ai/compat/openai"`, `apiKey: "-"`, and `x-opper-api-key` header. Models use Opper's naming format (e.g. `anthropic/claude-sonnet-4.5`, `anthropic/claude-haiku-4.5`). Note: Opper uses dots not dashes in version numbers, and no date suffixes. Requires `openai` npm package.
 - **Stack:** Next.js 16 (App Router), Prisma 5.22.0, Tailwind v4, Radix UI.

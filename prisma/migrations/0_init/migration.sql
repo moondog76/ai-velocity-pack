@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS "ProgramSettings" (
     "dayZero" TIMESTAMP(3) NOT NULL,
     "baselineDue" TIMESTAMP(3) NOT NULL,
     "sprintDue" TIMESTAMP(3) NOT NULL,
-    "aiModel" TEXT NOT NULL DEFAULT 'claude-sonnet-4-5-20250929',
+    "aiModel" TEXT NOT NULL DEFAULT 'anthropic/claude-sonnet-4.5',
     "autoAnalyze" BOOLEAN NOT NULL DEFAULT false,
     "maxAnalysesPerDay" INTEGER NOT NULL DEFAULT 3,
     "requireAiBeforeManual" BOOLEAN NOT NULL DEFAULT false,
@@ -174,7 +174,7 @@ ALTER TABLE "Company" ADD COLUMN IF NOT EXISTS "githubUrl" TEXT;
 ALTER TABLE "Company" ADD COLUMN IF NOT EXISTS "active" BOOLEAN NOT NULL DEFAULT true;
 
 -- Add missing columns to ProgramSettings (if table already exists without them)
-ALTER TABLE "ProgramSettings" ADD COLUMN IF NOT EXISTS "aiModel" TEXT NOT NULL DEFAULT 'claude-sonnet-4-5-20250929';
+ALTER TABLE "ProgramSettings" ADD COLUMN IF NOT EXISTS "aiModel" TEXT NOT NULL DEFAULT 'anthropic/claude-sonnet-4.5';
 ALTER TABLE "ProgramSettings" ADD COLUMN IF NOT EXISTS "autoAnalyze" BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE "ProgramSettings" ADD COLUMN IF NOT EXISTS "maxAnalysesPerDay" INTEGER NOT NULL DEFAULT 3;
 ALTER TABLE "ProgramSettings" ADD COLUMN IF NOT EXISTS "requireAiBeforeManual" BOOLEAN NOT NULL DEFAULT false;
