@@ -64,8 +64,14 @@ Always check this file before analysis, building, or debugging.
 ### 8. AI analysis not working — Anthropic SDK can't use Opper key
 - **Symptom:** AI scoring silently fails or returns 503
 - **Root cause:** `OPPER_KEY` is for Opper.ai (model orchestration), not a direct Anthropic API key. The Anthropic SDK sends requests to `api.anthropic.com` which rejects the Opper key.
-- **Fix:** Replaced Anthropic SDK with plain `fetch` to Opper's OpenAI-compatible endpoint (`https://api.opper.ai/compat/openai/v1/chat/completions`). Auth via `x-opper-api-key` header. Model names use `provider/model` format (e.g. `anthropic/claude-sonnet-4-5-20250929`).
+- **Fix:** Replaced Anthropic SDK with plain `fetch` to Opper's OpenAI-compatible endpoint (`https://api.opper.ai/compat/openai/chat/completions`). Auth via `x-opper-api-key` header. Model names use `provider/model` format (e.g. `anthropic/claude-sonnet-4-5-20250929`).
 - **Lesson:** When using model orchestration tools (Opper, OpenRouter, LiteLLM), don't use provider-specific SDKs. Use the OpenAI-compatible endpoint with `fetch` or the OpenAI SDK. Check the auth header format — Opper uses `x-opper-api-key`, not `Authorization: Bearer`.
+
+### 9. Opper API returning 404 — wrong endpoint URL
+- **Symptom:** AI analysis fails with `Opper API 404: {"errors":[{"type":"HTTPException","message":"Not Found"}]}`
+- **Root cause:** URL was `https://api.opper.ai/compat/openai/v1/chat/completions` — the `/v1/` is extra. Opper's base URL is `https://api.opper.ai/compat/openai` and the OpenAI SDK auto-appends `/chat/completions`. When using plain fetch, the full URL should NOT include `/v1/`.
+- **Fix:** Changed URL to `https://api.opper.ai/compat/openai/chat/completions`
+- **Lesson:** When translating from OpenAI SDK usage to plain fetch, remember the SDK's base URL doesn't include `/v1/` — the SDK adds its own path. Don't double up path segments. Always test the raw URL with curl first.
 
 ---
 
@@ -74,5 +80,5 @@ Always check this file before analysis, building, or debugging.
 - **Auth:** Real NextAuth v5 with credentials provider. `getCurrentUser()` reads the JWT session. Requires `NEXTAUTH_SECRET` env var. Login page at `/login`, register at `/register`.
 - **Deploy:** Railway with Nixpacks (nixpacks.toml controls build + start). Dockerfile exists but may not be used.
 - **DB:** PostgreSQL on Railway. Schema managed by Prisma. Use `prisma db push --accept-data-loss` for production schema sync.
-- **AI:** Uses Opper.ai as model orchestration layer. API calls go to `https://api.opper.ai/compat/openai/v1/chat/completions` with `x-opper-api-key` header. Models use `provider/model` format. No provider-specific SDK needed.
+- **AI:** Uses Opper.ai as model orchestration layer. API calls go to `https://api.opper.ai/compat/openai/chat/completions` with `x-opper-api-key` header. Models use `provider/model` format. No provider-specific SDK needed.
 - **Stack:** Next.js 16 (App Router), Prisma 5.22.0, Tailwind v4, Radix UI.

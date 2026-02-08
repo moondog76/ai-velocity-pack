@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       try {
         console.log(`[AI Analysis] Attempt ${attempt + 1} for ${company.name} | model: ${aiModel} | key: ${apiKey.substring(0, 8)}...`);
 
-        const response = await fetch('https://api.opper.ai/compat/openai/v1/chat/completions', {
+        const response = await fetch('https://api.opper.ai/compat/openai/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
