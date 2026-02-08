@@ -104,6 +104,33 @@ export default async function BestPracticesPage() {
 
       <div className="space-y-6">
 
+        {/* ── Core Principles ── */}
+        <div className="bg-slate-900 rounded-lg p-6">
+          <h2 className="text-lg font-bold text-white mb-4">The New Rules</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="bg-slate-800 rounded-lg p-4">
+              <span className="text-2xl mb-2 block">&#9889;</span>
+              <p className="text-sm font-semibold text-white">Writing code is fast now</p>
+            </div>
+            <div className="bg-slate-800 rounded-lg p-4">
+              <span className="text-2xl mb-2 block">&#127937;</span>
+              <p className="text-sm font-semibold text-white">Competitors move just as fast</p>
+            </div>
+            <div className="bg-slate-800 rounded-lg p-4">
+              <span className="text-2xl mb-2 block">&#129504;</span>
+              <p className="text-sm font-semibold text-white">Users can build too</p>
+            </div>
+            <div className="bg-slate-800 rounded-lg p-4">
+              <span className="text-2xl mb-2 block">&#129302;</span>
+              <p className="text-sm font-semibold text-white">If it&apos;s more than a few clicks, an agent should do it</p>
+            </div>
+            <div className="bg-slate-800 rounded-lg p-4">
+              <span className="text-2xl mb-2 block">&#129513;</span>
+              <p className="text-sm font-semibold text-white">Assume users will bring their own agents</p>
+            </div>
+          </div>
+        </div>
+
         {/* ── Industry Context ── */}
         <div className="bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-200 rounded-lg p-6">
           <h2 className="text-lg font-bold text-indigo-900 mb-2">The Shift Is Happening Now</h2>
