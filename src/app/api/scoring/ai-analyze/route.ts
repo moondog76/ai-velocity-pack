@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-utils';
+import OpenAI from 'openai';
 
 const SCORING_SYSTEM_PROMPT = `You are an AI scoring assistant for Asort Ventures' AI Velocity Pack program. You evaluate portfolio companies' submissions against a standardized rubric.
 
@@ -64,6 +65,16 @@ Respond ONLY with valid JSON matching this exact schema:
   "overallSummary": "2-3 sentence summary of the company's AI adoption progress",
   "recommendations": ["Specific actionable recommendation 1", "Recommendation 2"]
 }`;
+
+function createOpperClient(apiKey: string): OpenAI {
+  return new OpenAI({
+    baseURL: 'https://api.opper.ai/compat/openai',
+    apiKey: '-',
+    defaultHeaders: {
+      'x-opper-api-key': apiKey,
+    },
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -144,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     const submissionContent = submissionParts.join('\n');
 
-    // Call Opper API (OpenAI-compatible endpoint)
+    // Validate Opper API key
     const apiKey = process.env.OPPER_KEY;
     if (!apiKey) {
       return NextResponse.json({
@@ -159,6 +170,9 @@ export async function POST(request: NextRequest) {
       aiModel = `anthropic/${aiModel}`;
     }
 
+    // Create Opper client using OpenAI SDK (as per Opper docs)
+    const client = createOpperClient(apiKey);
+
     let aiResult: any;
     let lastError = '';
 
@@ -166,35 +180,19 @@ export async function POST(request: NextRequest) {
       try {
         console.log(`[AI Analysis] Attempt ${attempt + 1} for ${company.name} | model: ${aiModel} | key: ${apiKey.substring(0, 8)}...`);
 
-        const response = await fetch('https://api.opper.ai/compat/openai/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer -',
-            'x-opper-api-key': apiKey,
-          },
-          body: JSON.stringify({
-            model: aiModel,
-            messages: [
-              { role: 'system', content: SCORING_SYSTEM_PROMPT },
-              { role: 'user', content: `Please analyze the following company submissions and provide scores:\n\n${submissionContent}` },
-            ],
-            max_tokens: 4096,
-            temperature: 0.3,
-          }),
+        const completion = await client.chat.completions.create({
+          model: aiModel,
+          messages: [
+            { role: 'system', content: SCORING_SYSTEM_PROMPT },
+            { role: 'user', content: `Please analyze the following company submissions and provide scores:\n\n${submissionContent}` },
+          ],
+          max_tokens: 4096,
+          temperature: 0.3,
         });
 
-        if (!response.ok) {
-          const errText = await response.text();
-          lastError = `Opper API ${response.status}: ${errText.substring(0, 200)}`;
-          console.error('[AI Analysis] API error:', lastError);
-          throw new Error(lastError);
-        }
+        const content = completion.choices?.[0]?.message?.content || '';
+        console.log(`[AI Analysis] Response received, length: ${content.length}`);
 
-        const data = await response.json();
-        console.log('[AI Analysis] Response received, parsing...');
-
-        const content = data.choices?.[0]?.message?.content || '';
         if (!content) {
           lastError = 'Empty response from AI model';
           throw new Error(lastError);
@@ -203,6 +201,7 @@ export async function POST(request: NextRequest) {
         // Strip markdown code fences if present
         const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         aiResult = JSON.parse(cleaned);
+        console.log(`[AI Analysis] Successfully parsed response for ${company.name}`);
         break;
       } catch (err: any) {
         lastError = err.message || 'Unknown error';
