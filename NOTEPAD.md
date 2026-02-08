@@ -65,7 +65,7 @@ Always check this file before analysis, building, or debugging.
 
 ## Architecture Notes
 
-- **Auth:** Currently using bypass in `src/lib/auth-utils.ts` — returns hardcoded admin. Real NextAuth is configured but bypassed.
+- **Auth:** Real NextAuth v5 with credentials provider. `getCurrentUser()` reads the JWT session. Requires `NEXTAUTH_SECRET` env var. Login page at `/login`, register at `/register`.
 - **Deploy:** Railway with Nixpacks (nixpacks.toml controls build + start). Dockerfile exists but may not be used.
 - **DB:** PostgreSQL on Railway. Schema managed by Prisma. Use `prisma db push --accept-data-loss` for production schema sync.
 - **Stack:** Next.js 16 (App Router), Prisma 5.22.0, Tailwind v4, Radix UI, Anthropic SDK for AI scoring.
