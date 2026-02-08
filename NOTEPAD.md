@@ -55,6 +55,12 @@ Always check this file before analysis, building, or debugging.
 - **Fix:** Auto-trigger AI on page load (useEffect), separate AI column vs Final Score column, "Accept All" button
 - **Lesson:** "If it's more than a few clicks, an agent should do it." Make AI proactive, not reactive. Keep human override but don't require human initiation.
 
+### 7. Audit upload broken — JSON body with file content
+- **Symptom:** Upload fails silently or with body size errors
+- **Root cause:** File content was read with `file.text()` (breaks PDFs) and sent as JSON string (hits body size limits)
+- **Fix:** Switch to `FormData` upload on client, `request.formData()` on server. Use `Buffer.from(arrayBuffer)` for all file types.
+- **Lesson:** Never send file content as JSON. Always use FormData for file uploads. Handle binary files (PDF) with ArrayBuffer, not `.text()`.
+
 ---
 
 ## Architecture Notes
