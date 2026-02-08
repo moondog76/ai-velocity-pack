@@ -160,11 +160,12 @@ export async function POST(request: NextRequest) {
     }
 
     let aiResult: any;
-    let retries = 0;
+    let lastError = '';
 
-    while (retries < 2) {
+    for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        console.log(`[AI Analysis] Calling Opper API for ${company.name} with model ${aiModel}`);
+        console.log(`[AI Analysis] Attempt ${attempt + 1} for ${company.name} | model: ${aiModel} | key: ${apiKey.substring(0, 8)}...`);
+
         const response = await fetch('https://api.opper.ai/compat/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -185,24 +186,31 @@ export async function POST(request: NextRequest) {
 
         if (!response.ok) {
           const errText = await response.text();
-          console.error('Opper API error:', response.status, errText);
-          throw new Error(`API returned ${response.status}`);
+          lastError = `Opper API ${response.status}: ${errText.substring(0, 200)}`;
+          console.error('[AI Analysis] API error:', lastError);
+          throw new Error(lastError);
         }
 
         const data = await response.json();
+        console.log('[AI Analysis] Response received, parsing...');
+
         const content = data.choices?.[0]?.message?.content || '';
+        if (!content) {
+          lastError = 'Empty response from AI model';
+          throw new Error(lastError);
+        }
 
         // Strip markdown code fences if present
         const cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         aiResult = JSON.parse(cleaned);
         break;
-      } catch (parseErr: any) {
-        console.error('AI analysis attempt failed:', parseErr.message);
-        retries++;
-        if (retries >= 2) {
+      } catch (err: any) {
+        lastError = err.message || 'Unknown error';
+        console.error(`[AI Analysis] Attempt ${attempt + 1} failed:`, lastError);
+        if (attempt >= 1) {
           return NextResponse.json({
             success: false,
-            error: 'AI analysis temporarily unavailable. You can still score manually.',
+            error: `AI analysis failed: ${lastError}`,
           }, { status: 503 });
         }
       }
@@ -226,10 +234,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('AI analysis error:', error);
+    console.error('[AI Analysis] Unhandled error:', error);
     return NextResponse.json({
       success: false,
-      error: 'AI analysis temporarily unavailable. You can still score manually.',
+      error: `AI analysis error: ${error.message || 'Unknown error'}`,
     }, { status: 500 });
   }
 }
