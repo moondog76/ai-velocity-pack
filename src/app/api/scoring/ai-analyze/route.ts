@@ -146,11 +146,11 @@ export async function POST(request: NextRequest) {
     const submissionContent = submissionParts.join('\n');
 
     // Call Anthropic API
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.OPPER_KEY;
     if (!apiKey) {
       return NextResponse.json({
         success: false,
-        error: 'AI analysis temporarily unavailable. ANTHROPIC_API_KEY not configured. You can still score manually.',
+        error: 'AI analysis temporarily unavailable. OPPER_KEY not configured. You can still score manually.',
       }, { status: 503 });
     }
 

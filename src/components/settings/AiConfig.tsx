@@ -98,7 +98,7 @@ export function AiConfig({ settings }: AiConfigProps) {
               value={apiKeyDisplay}
               className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md bg-slate-50 text-slate-500"
             />
-            <p className="text-xs text-slate-500 mt-1">API key is stored as an environment variable on the server (ANTHROPIC_API_KEY)</p>
+            <p className="text-xs text-slate-500 mt-1">API key is stored as an environment variable on the server (OPPER_KEY)</p>
           </div>
           <button
             onClick={handleTestConnection}
@@ -116,7 +116,7 @@ export function AiConfig({ settings }: AiConfigProps) {
         )}
         {testResult === 'error' && (
           <div className="flex items-center gap-1.5 mt-2 text-sm text-red-600">
-            <XCircle className="h-4 w-4" /> Failed — check ANTHROPIC_API_KEY environment variable
+            <XCircle className="h-4 w-4" /> Failed — check OPPER_KEY environment variable
           </div>
         )}
       </div>
