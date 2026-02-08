@@ -153,13 +153,18 @@ export async function POST(request: NextRequest) {
       }, { status: 503 });
     }
 
-    const aiModel = settings?.aiModel || 'anthropic/claude-sonnet-4-5-20250929';
+    // Ensure model name has provider prefix (old DB values may lack it)
+    let aiModel = settings?.aiModel || 'anthropic/claude-sonnet-4-5-20250929';
+    if (!aiModel.includes('/')) {
+      aiModel = `anthropic/${aiModel}`;
+    }
 
     let aiResult: any;
     let retries = 0;
 
     while (retries < 2) {
       try {
+        console.log(`[AI Analysis] Calling Opper API for ${company.name} with model ${aiModel}`);
         const response = await fetch('https://api.opper.ai/compat/openai/v1/chat/completions', {
           method: 'POST',
           headers: {

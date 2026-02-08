@@ -58,7 +58,7 @@ const confidenceLabels = {
   low: 'Low',
 };
 
-export function ScoringForm({ companyId, companyName, existingScore, hasSubmissions, existingAiAnalysis }: ScoringFormProps) {
+export function ScoringForm({ companyId, existingScore, hasSubmissions, existingAiAnalysis }: ScoringFormProps) {
   const router = useRouter();
   const hasTriggered = useRef(false);
 
@@ -173,15 +173,30 @@ export function ScoringForm({ companyId, companyName, existingScore, hasSubmissi
 
   return (
     <div>
+      {/* Error banner — shown prominently at top */}
+      {message?.type === 'error' && (
+        <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-md flex items-center justify-between">
+          <span className="text-sm text-red-700">{message.text}</span>
+          <button
+            onClick={runAiAnalysis}
+            disabled={analyzing}
+            className="flex items-center gap-1 px-2.5 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* Table header */}
       <div className="grid grid-cols-[1fr,80px,80px,160px] gap-2 mb-2 px-1">
         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dimension</div>
         <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider text-center flex items-center justify-center gap-1">
           AI
-          {!analyzing && aiResult && (
+          {!analyzing && hasSubmissions && (
             <button
               onClick={runAiAnalysis}
-              title="Re-analyze"
+              title={aiResult ? 'Re-analyze' : 'Run AI analysis'}
               className="text-purple-400 hover:text-purple-600 transition-colors"
             >
               <RefreshCw className="h-3 w-3" />
