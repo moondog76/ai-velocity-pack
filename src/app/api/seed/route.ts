@@ -11,11 +11,11 @@ export async function POST() {
     }
 
     // Create admin user
-    const adminPassword = await bcrypt.hash('asort2026', 10);
+    const adminPassword = await bcrypt.hash('luminar2026', 10);
     const admin = await prisma.user.create({
       data: {
-        email: 'admin@asort.vc',
-        name: 'Asort Admin',
+        email: 'admin@luminarventures.com',
+        name: 'Luminar Admin',
         passwordHash: adminPassword,
         role: 'ADMIN',
       },

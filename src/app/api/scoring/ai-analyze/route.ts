@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-utils';
 import OpenAI from 'openai';
 
-const SCORING_SYSTEM_PROMPT = `You are an AI scoring assistant for Asort Ventures' AI Velocity Pack program. You evaluate portfolio companies' submissions against a standardized rubric.
+const SCORING_SYSTEM_PROMPT = `You are an AI scoring assistant for Luminar Ventures' AI Velocity Pack program. You evaluate portfolio companies' submissions against a standardized rubric.
 
 ## Scoring Rubric (0–3 per dimension)
 

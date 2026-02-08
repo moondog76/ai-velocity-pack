@@ -55,7 +55,7 @@ Railway will automatically:
 Your public URL will be: `https://your-project.up.railway.app`
 
 **Default Login:**
-- Admin: `admin@asort.vc` / `asort2026`
+- Admin: `admin@luminarventures.com` / `luminar2026`
 - Company: `alex@greenroute.com` / `password123`
 
 ---

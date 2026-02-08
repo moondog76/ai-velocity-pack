@@ -1,6 +1,6 @@
 # AI Velocity Pack Platform
 
-Portfolio management platform for Asort Ventures' AI Velocity Pack program.
+Portfolio management platform for Luminar Ventures' AI Velocity Pack program.
 
 ## Tech Stack
 
@@ -32,7 +32,7 @@ Portfolio management platform for Asort Ventures' AI Velocity Pack program.
 
 ### Default Credentials
 
-- **Admin**: `admin@asort.vc` / `asort2026`
+- **Admin**: `admin@luminarventures.com` / `luminar2026`
 - **Company**: `alex@greenroute.com` / `password123`
 
 ## Database Commands

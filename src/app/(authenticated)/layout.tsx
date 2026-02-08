@@ -20,7 +20,7 @@ export default async function AuthenticatedLayout({
       <MobileNav user={user} />
 
       {/* Main content */}
-      <main className="flex-1 lg:ml-64 bg-slate-50">
+      <main className="flex-1 lg:ml-64 bg-[#F8F6F0]">
         <div className="p-6 lg:p-8">{children}</div>
       </main>
     </div>

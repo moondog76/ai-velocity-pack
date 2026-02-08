@@ -85,11 +85,11 @@ export function Sidebar({ onClose, user }: SidebarProps) {
   );
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 text-slate-300">
+    <div className="flex flex-col h-full bg-[#1a3a28] text-slate-300">
       {/* Logo/Header */}
-      <div className="p-6 border-b border-slate-800">
-        <h1 className="text-white text-lg font-bold">Asort Ventures</h1>
-        <p className="text-xs text-slate-400 mt-1">AI Velocity Pack</p>
+      <div className="p-6 border-b border-[#265039]">
+        <h1 className="text-white text-lg font-bold tracking-tight">Luminar Ventures</h1>
+        <p className="text-xs text-[#C8F7AA]/60 mt-1">AI Velocity Pack</p>
       </div>
 
       {/* Navigation */}
@@ -106,8 +106,8 @@ export function Sidebar({ onClose, user }: SidebarProps) {
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-indigo-600 text-white'
-                  : 'hover:bg-slate-800 hover:text-white'
+                  ? 'bg-[#265039] text-white'
+                  : 'hover:bg-[#265039]/60 hover:text-white'
               )}
             >
               <Icon className="h-5 w-5" />
@@ -119,9 +119,9 @@ export function Sidebar({ onClose, user }: SidebarProps) {
 
       {/* User info */}
       {user && (
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-[#265039]">
           <div className="flex items-start gap-3 mb-3">
-            <div className="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium">
+            <div className="h-10 w-10 rounded-full bg-[#265039] flex items-center justify-center text-[#C8F7AA] font-medium">
               {user.name?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
@@ -131,14 +131,14 @@ export function Sidebar({ onClose, user }: SidebarProps) {
               <p className="text-xs text-slate-400 truncate">
                 {user.email}
               </p>
-              <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300">
+              <span className="inline-block mt-1 px-2 py-0.5 text-xs rounded-full bg-[#265039]/50 text-[#C8F7AA]/80">
                 {userRole === 'ADMIN' ? 'Admin' : 'Company User'}
               </span>
             </div>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-md hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-md hover:bg-[#265039]/60 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             <span>Sign out</span>

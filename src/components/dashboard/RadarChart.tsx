@@ -46,8 +46,8 @@ export function ScoreRadar({ scores }: ScoreRadarProps) {
         <Radar
           name="Score"
           dataKey="score"
-          stroke="#4f46e5"
-          fill="#4f46e5"
+          stroke="#265039"
+          fill="#265039"
           fillOpacity={0.25}
           strokeWidth={2}
         />

@@ -29,7 +29,7 @@ This 14-day program measures how agentic AI coding tools improve your team's del
 
 - **Webinar** (Feb 10): Executive overview and expectations
 - **Training Sessions** (Feb 12, 17, 19): Hands-on workshops
-- **Office Hours** (Wednesdays & Fridays): Support from Asort team
+- **Office Hours** (Wednesdays & Fridays): Support from Luminar team
 - **Scoring** (Post-Day 14): Assessment across 6 dimensions
 
 ## Success Criteria
@@ -46,10 +46,10 @@ We're looking for evidence of:
 - **Feb 9**: Baseline due
 - **Feb 20**: Sprint Report & Governance due
 
-Questions? Email velocity@asort.vc or join office hours.
+Questions? Email velocity@luminarventures.com or join office hours.
 
 ---
-**Asort Ventures** | Accelerating AI-powered software teams`;
+**Luminar Ventures** | Accelerating AI-powered software teams`;
 
 export const webinarSlides = [
   {
@@ -125,7 +125,7 @@ export const webinarSlides = [
     bullets: [
       'Training sessions: Feb 12, 17, 19',
       'Office hours: Wednesdays & Fridays 9:00 CET',
-      'Email: velocity@asort.vc',
+      'Email: velocity@luminarventures.com',
       'This portal for submissions and tracking'
     ]
   }

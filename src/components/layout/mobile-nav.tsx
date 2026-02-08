@@ -16,7 +16,7 @@ export function MobileNav({ user }: MobileNavProps) {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 p-2 bg-slate-900 text-white rounded-md"
+        className="lg:hidden fixed top-4 left-4 z-40 p-2 bg-[#1a3a28] text-white rounded-md"
       >
         <Menu className="h-6 w-6" />
       </button>

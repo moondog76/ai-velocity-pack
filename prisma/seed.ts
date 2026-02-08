@@ -17,11 +17,11 @@ async function main() {
   await prisma.programSettings.deleteMany();
 
   // Create admin user
-  const adminPasswordHash = await bcrypt.hash('asort2026', 10);
+  const adminPasswordHash = await bcrypt.hash('luminar2026', 10);
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@asort.vc',
-      name: 'Asort Admin',
+      email: 'admin@luminarventures.com',
+      name: 'Luminar Admin',
       passwordHash: adminPasswordHash,
       role: 'ADMIN',
     },
@@ -511,7 +511,7 @@ async function main() {
 
   console.log('Seed completed successfully!');
   console.log('\nLogin credentials:');
-  console.log('Admin: admin@asort.vc / asort2026');
+  console.log('Admin: admin@luminarventures.com / luminar2026');
   console.log('Companies: sarah@novapay.io, alex@greenroute.com, etc. / password123');
 }
 

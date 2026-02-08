@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Velocity Pack | Asort Ventures",
-  description: "Portfolio management platform for Asort Ventures' AI Velocity Pack program",
+  title: "AI Velocity Pack | Luminar Ventures",
+  description: "Portfolio management platform for Luminar Ventures' AI Velocity Pack program",
 };
 
 export default function RootLayout({

@@ -18,15 +18,15 @@ export const calendarEvents: CalendarEvent[] = [
     type: 'WEBINAR',
     icsContent: `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Asort Ventures//AI Velocity Pack//EN
+PRODID:-//Luminar Ventures//AI Velocity Pack//EN
 BEGIN:VEVENT
-UID:executive-webinar-2026@asort.vc
+UID:executive-webinar-2026@luminarventures.com
 DTSTAMP:20260201T120000Z
 DTSTART:20260210T090000Z
 DTEND:20260210T100000Z
 SUMMARY:AI Velocity Pack - Executive Webinar
 DESCRIPTION:Introduction to the AI Velocity Pack program for CEOs and CTOs. Learn about the program structure\\, deliverables\\, and success criteria.
-LOCATION:https://meet.asort.vc/executive-webinar
+LOCATION:https://meet.luminarventures.com/executive-webinar
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
@@ -45,15 +45,15 @@ END:VCALENDAR`
     type: 'TRAINING',
     icsContent: `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Asort Ventures//AI Velocity Pack//EN
+PRODID:-//Luminar Ventures//AI Velocity Pack//EN
 BEGIN:VEVENT
-UID:training-1-2026@asort.vc
+UID:training-1-2026@luminarventures.com
 DTSTAMP:20260201T120000Z
 DTSTART:20260212T120000Z
 DTEND:20260212T131500Z
 SUMMARY:AI Velocity Pack - Training 1: Workflow Shift
 DESCRIPTION:Hands-on training on shifting from manual coding to agentic workflows. Learn prompt patterns and best practices.
-LOCATION:https://meet.asort.vc/training-1
+LOCATION:https://meet.luminarventures.com/training-1
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
@@ -72,15 +72,15 @@ END:VCALENDAR`
     type: 'TRAINING',
     icsContent: `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Asort Ventures//AI Velocity Pack//EN
+PRODID:-//Luminar Ventures//AI Velocity Pack//EN
 BEGIN:VEVENT
-UID:training-2-2026@asort.vc
+UID:training-2-2026@luminarventures.com
 DTSTAMP:20260201T120000Z
 DTSTART:20260217T120000Z
 DTEND:20260217T131500Z
 SUMMARY:AI Velocity Pack - Training 2: Roadmap + QA Shift
 DESCRIPTION:Training on using AI for roadmap planning and automated QA. Learn to leverage AI for test generation and quality assurance.
-LOCATION:https://meet.asort.vc/training-2
+LOCATION:https://meet.luminarventures.com/training-2
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M
@@ -99,15 +99,15 @@ END:VCALENDAR`
     type: 'TRAINING',
     icsContent: `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Asort Ventures//AI Velocity Pack//EN
+PRODID:-//Luminar Ventures//AI Velocity Pack//EN
 BEGIN:VEVENT
-UID:training-3-2026@asort.vc
+UID:training-3-2026@luminarventures.com
 DTSTAMP:20260201T120000Z
 DTSTART:20260219T120000Z
 DTEND:20260219T131500Z
 SUMMARY:AI Velocity Pack - Training 3: Customer Feedback Loop
 DESCRIPTION:Training on closing the loop from customer feedback to shipped features using agentic AI workflows.
-LOCATION:https://meet.asort.vc/training-3
+LOCATION:https://meet.luminarventures.com/training-3
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT15M

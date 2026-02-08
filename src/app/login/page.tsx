@@ -38,7 +38,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8F6F0] px-4">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-8">
           {/* Header */}
@@ -125,7 +125,7 @@ export default function LoginPage() {
             </p>
             <div className="text-xs text-slate-600 space-y-1">
               <p className="text-center">
-                <span className="font-medium">Admin:</span> admin@asort.vc / asort2026
+                <span className="font-medium">Admin:</span> admin@luminarventures.com / luminar2026
               </p>
               <p className="text-center">
                 <span className="font-medium">Company:</span> alex@greenroute.com / password123

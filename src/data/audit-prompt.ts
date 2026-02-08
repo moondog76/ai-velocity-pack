@@ -64,5 +64,5 @@ export const auditInstructions = `## How to Run the Audit
 ### Upload Instructions:
 - Save the audit report as a .md, .txt, or .pdf file
 - File size limit: 10MB
-- The audit will be visible to Asort team for review
+- The audit will be visible to Luminar team for review
 - You can update your audit at any time before the baseline deadline`;
